@@ -381,14 +381,14 @@ body {
 
 /* ── Header ── */
 header {
-  display:flex; align-items:center; gap:16px;
-  padding:0 24px; height:54px;
+  display:flex; align-items:center; gap:12px;
+  padding:0 20px; height:54px;
   background:var(--accent); border-bottom:3px solid var(--accent-d);
-  flex-shrink:0;
+  flex-shrink:0; overflow:hidden;
 }
-.hdr-book { display:flex; flex-direction:column; gap:1px; }
+.hdr-book { display:flex; flex-direction:column; gap:1px; flex-shrink:0; }
 .hdr-title {
-  font-size:14px; font-weight:800; color:#fff;
+  font-size:13px; font-weight:800; color:#fff;
   letter-spacing:.04em; text-transform:uppercase; line-height:1;
 }
 .hdr-sub {
@@ -397,15 +397,24 @@ header {
 }
 .hdr-sep { width:1px; height:26px; background:rgba(255,255,255,.22); flex-shrink:0; }
 #hdr-unit {
-  font-size:12px; color:rgba(255,255,255,.80); flex:1;
+  font-size:12px; color:rgba(255,255,255,.80); flex:1; min-width:0;
   white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
 }
 #btn-back-map {
   background:rgba(0,0,0,.22); border:1px solid rgba(255,255,255,.25);
-  color:#fff; border-radius:6px; padding:5px 16px;
-  font-size:12px; font-weight:600; cursor:pointer; white-space:nowrap;
+  color:#fff; border-radius:6px; padding:5px 12px;
+  font-size:12px; font-weight:600; cursor:pointer; white-space:nowrap; flex-shrink:0;
 }
 #btn-back-map:hover { background:rgba(0,0,0,.38); }
+@media (max-width:520px) {
+  header { gap:8px; padding:0 12px; }
+  .hdr-sub { display:none; }
+  .hdr-sep { display:none; }
+  .hdr-title { font-size:12px; }
+  .lang-btn { padding:3px 5px; font-size:9px; }
+  #hdr-user-name { display:none; }
+  #btn-back-map { padding:5px 10px; font-size:11px; }
+}
 
 /* ── Map view (full page) ── */
 #map-view {
