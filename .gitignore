@@ -1,0 +1,6 @@
+.anki_users.db
+.anki_users.json
+__pycache__/
+*.pyc
+.llm/
+anki_output/

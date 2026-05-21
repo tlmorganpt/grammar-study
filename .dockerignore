@@ -1,0 +1,10 @@
+.anki_users.db
+.anki_users.json
+__pycache__/
+*.pyc
+.git/
+.llm/
+anki_output/
+Abrir Leitor.command
+CLAUDE.md
+custom_exercises.py
