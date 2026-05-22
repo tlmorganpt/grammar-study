@@ -8,6 +8,10 @@ import http.server, socketserver, urllib.parse, zipfile, sqlite3, json
 import mimetypes, os, shutil, tempfile, threading, webbrowser, signal, sys, re
 import hashlib, uuid
 from datetime import date
+try:
+    import psycopg2, psycopg2.extras
+except ImportError:
+    psycopg2 = None
 
 APKG   = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                       "Anki", "English_Essential_Grammar_In_Use_Theory.apkg")
@@ -21,6 +25,7 @@ DB_FILE   = os.path.join(_DATA, '.anki_users.db')
 OUT_DIR   = os.path.join(_DATA, 'anki_output')
 PORT      = int(os.environ.get('PORT', 7654))
 _LOCAL    = not os.environ.get('PORT')  # False when running on Render/Fly
+_DB_URL   = os.environ.get('DATABASE_URL')  # Neon/PostgreSQL connection string
 TMP       = None
 TMP_EX    = None
 DECK      = {}
@@ -29,28 +34,58 @@ CUSTOM_EX = {}
 SESSIONS  = {}  # token -> username
 
 
-def init_db():
-    conn = sqlite3.connect(DB_FILE)
-    conn.executescript("""
-        CREATE TABLE IF NOT EXISTS users (
-            username TEXT PRIMARY KEY,
-            hash     TEXT NOT NULL,
-            created  TEXT DEFAULT (datetime('now'))
-        );
-        CREATE TABLE IF NOT EXISTS progress (
-            username TEXT PRIMARY KEY REFERENCES users(username) ON DELETE CASCADE,
-            done     TEXT NOT NULL DEFAULT '[]'
-        );
-    """)
-    conn.commit()
-    conn.close()
+class _DB:
+    """Thin wrapper that unifies SQLite (local) and PostgreSQL (production)."""
+    def __init__(self):
+        if _DB_URL and psycopg2:
+            self._c  = psycopg2.connect(_DB_URL, cursor_factory=psycopg2.extras.RealDictCursor)
+            self._pg = True
+        else:
+            self._c  = sqlite3.connect(DB_FILE)
+            self._c.row_factory = sqlite3.Row
+            self._c.execute("PRAGMA foreign_keys = ON")
+            self._pg = False
+
+    def execute(self, sql, params=()):
+        if self._pg:
+            cur = self._c.cursor()
+            cur.execute(sql.replace('?', '%s'), params)
+            return cur
+        return self._c.execute(sql, params)
+
+    def commit(self):
+        self._c.commit()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, *_):
+        if exc_type is None:
+            self._c.commit()
+        else:
+            self._c.rollback()
+        self._c.close()
 
 
 def db():
-    conn = sqlite3.connect(DB_FILE)
-    conn.row_factory = sqlite3.Row
-    conn.execute("PRAGMA foreign_keys = ON")
-    return conn
+    return _DB()
+
+
+def init_db():
+    with db() as conn:
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS users (
+                username TEXT PRIMARY KEY,
+                hash     TEXT NOT NULL,
+                created  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS progress (
+                username TEXT PRIMARY KEY REFERENCES users(username) ON DELETE CASCADE,
+                done     TEXT NOT NULL DEFAULT '[]'
+            )
+        """)
 
 
 def hash_pwd(pwd):

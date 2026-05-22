@@ -1,7 +1,8 @@
 FROM python:3.11-slim
 WORKDIR /app
-COPY anki_reader.py .
 COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY anki_reader.py .
 COPY custom_exercises.json .
 COPY Anki/ ./Anki/
 RUN mkdir -p /data
