@@ -448,24 +448,33 @@ header {
 }
 #btn-back-map:hover { background:rgba(0,0,0,.38); }
 @media (max-width:520px) {
-  /* ── Header ── */
-  header { gap:6px; padding:0 10px; height:46px; flex-wrap:nowrap; }
+  /* Header: 2-row layout — row 1: title+unit+back+user / row 2: lang buttons */
+  header {
+    flex-wrap: wrap;
+    height: auto;
+    min-height: 44px;
+    padding: 5px 10px;
+    gap: 3px 6px;
+    overflow: visible;
+  }
   .hdr-sub, .hdr-sep { display:none; }
   .hdr-title { font-size:11px; }
-  /* Lang switcher: visible but compact */
-  .lang-sw { gap:1px; flex-shrink:0; }
-  .lang-btn { padding:2px 4px; font-size:8px; }
-  /* User chip: show only the X button, no name, no icon */
-  #hdr-user { padding:3px 8px; gap:4px; flex-shrink:0; }
-  #hdr-user > span:first-child { display:none; } /* hide 👤 icon */
-  #hdr-user-name { font-size:10px; max-width:64px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; display:block; }
-  #btn-back-map { padding:4px 8px; font-size:10px; }
-  /* ── Steps bar ── */
-  .steps-bar { padding:6px 10px; gap:0; overflow:hidden; }
+  .hdr-book { flex-shrink:0; }
+  #hdr-unit { flex:1; min-width:0; font-size:11px; }
+  #btn-back-map { padding:4px 8px; font-size:10px; flex-shrink:0; }
+  /* User chip: truncated name + X, no icon */
+  #hdr-user { flex-shrink:0; padding:3px 8px; gap:4px; }
+  #hdr-user > span:first-child { display:none; }
+  #hdr-user-name { font-size:10px; max-width:64px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  /* Lang switcher pushed to its own row below */
+  .lang-sw { order:10; width:100%; justify-content:flex-end; gap:3px; padding-top:3px; border-top:1px solid rgba(255,255,255,.12); }
+  .lang-btn { padding:2px 7px; font-size:9px; }
+  /* Steps bar: circle-only buttons stretch evenly, timer at right */
+  .steps-bar { padding:6px 8px; }
   .step-lbl { display:none; }
-  .step-sep { width:6px; flex-shrink:0; }
-  .step-btn { padding:5px 8px; gap:3px; flex-shrink:0; }
-  #step-timer { font-size:11px; padding:2px 6px; min-width:38px; }
+  .step-sep { display:none; }
+  .step-btn { flex:1; min-width:0; padding:6px 0; justify-content:center; gap:0; }
+  #step-timer { flex-shrink:0; font-size:11px; padding:2px 7px; min-width:40px; }
 }
 
 /* ── Map view (full page) ── */
