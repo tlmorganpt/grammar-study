@@ -448,13 +448,24 @@ header {
 }
 #btn-back-map:hover { background:rgba(0,0,0,.38); }
 @media (max-width:520px) {
-  header { gap:8px; padding:0 12px; }
-  .hdr-sub { display:none; }
-  .hdr-sep { display:none; }
-  .hdr-title { font-size:12px; }
-  .lang-btn { padding:3px 5px; font-size:9px; }
-  #hdr-user-name { display:none; }
-  #btn-back-map { padding:5px 10px; font-size:11px; }
+  /* ── Header ── */
+  header { gap:6px; padding:0 10px; height:46px; flex-wrap:nowrap; }
+  .hdr-sub, .hdr-sep { display:none; }
+  .hdr-title { font-size:11px; }
+  /* Lang switcher: visible but compact */
+  .lang-sw { gap:1px; flex-shrink:0; }
+  .lang-btn { padding:2px 4px; font-size:8px; }
+  /* User chip: show only the X button, no name, no icon */
+  #hdr-user { padding:3px 8px; gap:4px; flex-shrink:0; }
+  #hdr-user > span:first-child { display:none; } /* hide 👤 icon */
+  #hdr-user-name { font-size:10px; max-width:64px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; display:block; }
+  #btn-back-map { padding:4px 8px; font-size:10px; }
+  /* ── Steps bar ── */
+  .steps-bar { padding:6px 10px; gap:0; overflow:hidden; }
+  .step-lbl { display:none; }
+  .step-sep { width:6px; flex-shrink:0; }
+  .step-btn { padding:5px 8px; gap:3px; flex-shrink:0; }
+  #step-timer { font-size:11px; padding:2px 6px; min-width:38px; }
 }
 
 /* ── Map view (full page) ── */
@@ -907,13 +918,13 @@ header {
 <!-- Module view (full page, hidden initially) -->
 <div id="module-view" style="display:none">
   <div class="steps-bar">
-    <button class="step-btn" id="sb1" onclick="goStep(1)"><span class="n">1</span> Teoria<span class="step-time" id="st1"></span></button>
+    <button class="step-btn" id="sb1" onclick="goStep(1)"><span class="n">1</span><span class="step-lbl"> Teoria</span><span class="step-time" id="st1"></span></button>
     <div class="step-sep"></div>
-    <button class="step-btn" id="sb2" onclick="goStep(2)"><span class="n">2</span> Livro<span class="step-time" id="st2"></span></button>
+    <button class="step-btn" id="sb2" onclick="goStep(2)"><span class="n">2</span><span class="step-lbl"> Livro</span><span class="step-time" id="st2"></span></button>
     <div class="step-sep"></div>
-    <button class="step-btn" id="sb3" onclick="goStep(3)"><span class="n">3</span> Praticar<span class="step-time" id="st3"></span></button>
+    <button class="step-btn" id="sb3" onclick="goStep(3)"><span class="n">3</span><span class="step-lbl"> Praticar</span><span class="step-time" id="st3"></span></button>
     <div class="step-sep"></div>
-    <button class="step-btn" id="sb4" onclick="goStep(4)"><span class="n">4</span> Concluir<span class="step-time" id="st4"></span></button>
+    <button class="step-btn" id="sb4" onclick="goStep(4)"><span class="n">4</span><span class="step-lbl"> Concluir</span><span class="step-time" id="st4"></span></button>
     <span id="step-timer" style="display:none">0:00</span>
   </div>
   <div class="step-content" id="step-content"></div>
