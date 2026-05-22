@@ -9,9 +9,11 @@ import mimetypes, os, shutil, tempfile, threading, webbrowser, signal, sys, re
 import hashlib, uuid
 from datetime import date
 try:
-    import psycopg2, psycopg2.extras
+    import psycopg2, psycopg2.extras, psycopg2.errors
+    _INTEGRITY_ERRORS = (sqlite3.IntegrityError, psycopg2.errors.UniqueViolation)
 except ImportError:
     psycopg2 = None
+    _INTEGRITY_ERRORS = (sqlite3.IntegrityError,)
 
 APKG   = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                       "Anki", "English_Essential_Grammar_In_Use_Theory.apkg")
@@ -31,6 +33,8 @@ TMP_EX    = None
 DECK      = {}
 DECK_EX   = {}
 CUSTOM_EX = {}
+# Intentionally in-memory: tokens vanish on restart, forcing re-login.
+# A shared app on a single-process server doesn't need token persistence.
 SESSIONS  = {}  # token -> username
 
 
@@ -49,7 +53,7 @@ class _DB:
     def execute(self, sql, params=()):
         if self._pg:
             cur = self._c.cursor()
-            cur.execute(sql.replace('?', '%s'), params)
+            cur.execute(sql.replace('?', '%s'), params)  # SQLite uses ?, psycopg2 uses %s
             return cur
         return self._c.execute(sql, params)
 
@@ -72,6 +76,7 @@ def db():
 
 
 def init_db():
+    # Two separate execute() calls — psycopg2 doesn't support executescript()
     with db() as conn:
         conn.execute("""
             CREATE TABLE IF NOT EXISTS users (
@@ -89,6 +94,7 @@ def init_db():
 
 
 def hash_pwd(pwd):
+    # No salt — acceptable for a low-stakes personal tool. Use bcrypt for anything public.
     return hashlib.sha256(pwd.encode("utf-8")).hexdigest()
 
 
@@ -2610,7 +2616,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
                         "INSERT INTO progress (username) VALUES (?)", (username,)
                     )
                     conn.commit()
-            except sqlite3.IntegrityError:
+            except _INTEGRITY_ERRORS:
                 self._send(200, "application/json", json.dumps({"error": "err_exists"}).encode())
                 return
             token = str(uuid.uuid4())
