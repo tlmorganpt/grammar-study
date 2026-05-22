@@ -2,7 +2,10 @@
 
 A self-hosted web app for studying **Essential Grammar in Use** (Raymond Murphy, Cambridge University Press) using a structured 4-step method with spaced repetition via Anki.
 
+**Live demo:** [grammar-study.onrender.com](https://grammar-study.onrender.com)
+
 > **Note:** This app is a study companion. The full experience requires the physical book.
+> Free tier on Render — first load after inactivity may take ~30 s to wake up.
 
 ---
 
